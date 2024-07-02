@@ -8,7 +8,8 @@ from vendor.forms import *
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
-
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 def check_role_vendor(user):
     if user.role == 1:
         return True
@@ -80,6 +81,8 @@ def registervendor(request):
             user_profile = UserProfile.objects.get(user = user)
             vendor.user_profile = user_profile
             vendor.save() 
+            # send verification email 
+            send_verification_email(request,user)
             messages.success(request, 'your account has been registered successfully! please wait for the approval.')
             return redirect('registervendor')
         else :
@@ -93,6 +96,23 @@ def registervendor(request):
     }
     return render(request, 'accounts/registervendor.html', context)
 
+def activate(request, uidb64,token ):
+    #  activate the user by setting the is_active status true
+    try:
+        user = None
+        uid = urlsafe_base64_decode(uidb64).decode()
+        print(uid)
+        user = NewUser._default_manager.get(pk=uid)
+    except(user.DoesNotExist, TypeError, ValueError, OverflowError):
+        user = None
+    if user is not None and default_token_generator.check_token(user,token):
+        user.is_active = True
+        user.save()
+        messages.success(request, 'Congratulations! your account is activated.')
+        return redirect('myaccount')
+    else:
+        messages.error(request, 'Invalid activation link.')
+        return redirect('myaccount')
 # def login(request):
 #     if request.user.is_authenticated:
 #         messages.warning(request, 'you are already logged in.')
@@ -117,15 +137,20 @@ def registervendor(request):
 #     return redirect('login')
 def dashboard(request):
     return render(request, 'accounts/dashboard.html')
-@login_required(login_url='login')
+@login_required
 @user_passes_test(check_role_vendor)
 def vendordashboard(request):
     return render(request, 'accounts/vendordashboard.html')
-@login_required(login_url='login')
+@login_required
 @user_passes_test(check_role_cust)
 def custdashboard(request):
     return render(request, 'accounts/custdashboard.html')
 
-
+def forgetpassword(request):
+    return render(request, 'accounts/forgot_password.html')
+def reset_password_validate(request, uidb64, token):
+    return 
+def reset_password(request):
+    return render(request, 'accounts/reset_password.html')
 
 # twilio recovery code ----->      82D15S7ZY1ZPUW6NE34KZN9D
