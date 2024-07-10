@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
     path('accounts/', include('verification.urls')),
+    path('marketplace/', include('marketplace.urls')),
     # path("login/", LoginView.as_view(), name="login"),
     # path("logout/", LogoutView.as_view(), name="logout"),
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

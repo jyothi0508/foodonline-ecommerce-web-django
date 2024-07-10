@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from vendor.models import *
 def check_role_vendor(user):
     if user.role == 1:
         return True
@@ -47,7 +48,9 @@ def registeruser(request):
             user.role = NewUser.CUSTOMER
             user.save()
             # send verification email 
-            send_verification_email(request,user)
+            mail_subject = 'please activaye your account'
+            email_template = 'accounts/emails/account_verification_email.html'
+            send_verification_email(request,user, mail_subject, email_template)
             messages.success(request, 'your account was registered successfully')
             return redirect('registeruser')
         else:
@@ -82,8 +85,10 @@ def registervendor(request):
             vendor.user_profile = user_profile
             vendor.save() 
             # send verification email 
-            send_verification_email(request,user)
-            messages.success(request, 'your account has been registered successfully! please wait for the approval.')
+            mail_subject = 'please activaye your account'
+            email_template = 'accounts/emails/account_verification_email.html'
+            send_verification_email(request,user, mail_subject, email_template)
+            messages.success(request, 'your account has been registered successfully! Activation link sent to your registered mail.')
             return redirect('registervendor')
         else :
             print(form.errors)
@@ -147,10 +152,58 @@ def custdashboard(request):
     return render(request, 'accounts/custdashboard.html')
 
 def forgetpassword(request):
-    return render(request, 'accounts/forgot_password.html')
+    # print(0)
+    if request.method == 'POST':
+        # print(1)
+        email = request.POST['email']
+        try:
+            user = NewUser.objects.get(email = email)
+            if user:
+                # user = user.objects.get(email=email)
+                # print(user.email)
+                mail_subject = 'Reset password link'
+                email_template = 'accounts/emails/reset_verification_email.html'
+                send_verification_email(request,user, mail_subject, email_template)
+                messages.success(request, 'Password rest link has been sent to your email address.')
+                return redirect('login')
+            else:
+                messages.error(request, 'user does not exist')
+                return redirect('forget_password') 
+        except  NewUser.DoesNotExist:
+            messages.error(request, 'user does not exist')
+            return redirect('forget_password')
+    elif request.method == 'GET':
+        return render(request, 'accounts/forgot_password.html')
 def reset_password_validate(request, uidb64, token):
-    return 
+    try:
+        user = None
+        uid = urlsafe_base64_decode(uidb64).decode()
+        # print(uid)
+        user = NewUser._default_manager.get(pk=uid)
+    except(user.DoesNotExist, TypeError, ValueError, OverflowError):
+        user = None
+    if user is not None and default_token_generator.check_token(user,token):
+        request.session['uid'] = uid
+        messages.info(request, 'you can reset your password')
+        return redirect('reset_password') 
+    else :
+        messages.error(request, 'This link has been expired!')
+        return redirect('myaccount')
 def reset_password(request):
+    if request.method == 'POST':
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        if password == confirm_password:
+            uid = request.session.get('uid')
+            user = NewUser.objects.get(pk = uid)
+            user.set_password(password)
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Password reset successfull.')
+            return redirect('login') 
+        else:
+            messages.error(request, 'password do not match')
+            return redirect('reset_password') 
     return render(request, 'accounts/reset_password.html')
 
 # twilio recovery code ----->      82D15S7ZY1ZPUW6NE34KZN9D

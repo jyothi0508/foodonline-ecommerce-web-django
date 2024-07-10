@@ -1,0 +1,12 @@
+{% autoescape off %}
+
+Hi {{user.first_name}},
+
+{% if is_approved%}
+
+    Congragulations! Your Restuarent is approved by our admin team. --foodonline
+    {% else %}
+        Sorry! Your Restuarent is not approved by our admin team. please contact support@foodonline for any queries. --foodonline
+{%endif%}
+
+{% endautoescape %}

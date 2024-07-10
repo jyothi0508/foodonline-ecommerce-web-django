@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'home',
     'verification',
     'vendor',
-    
+    'menu',
+    'marketplace',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +72,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'vendor.context_processor.get_vendor',
+                'vendor.context_processor.get_google_api',
             ],
         },
     },
@@ -154,3 +157,13 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 
 LOGIN_REDIRECT_URL = 'myaccount'
 LOGOUT_REDIRECT_URL = 'login'
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}
+
+GOOGLE_API_KEY = 'AIzaSyDPoD-OgGkcuze1otxFcnfc7-mUpBp-9M8'
+
+# 'AIzaSyC4yTudrg9pTcB2KhAgrbCMBfVvbviohVU'

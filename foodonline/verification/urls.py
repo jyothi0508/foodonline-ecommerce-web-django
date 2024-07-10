@@ -1,8 +1,9 @@
-from django.urls import  path
+from django.urls import  path, include
 from django.contrib.auth.views import LoginView,LogoutView
 from . import views
 
 urlpatterns = [
+    path('', views.myaccount),
     path('registeruser/', views.registeruser,name="registeruser"),
     path('registervendor/', views.registervendor,name="registervendor"),
     path('dashboard/', views.dashboard,name="dashboard"),
@@ -15,6 +16,7 @@ urlpatterns = [
     path("forget_password/", views.forgetpassword, name="forget_password"),
     path("reset_password_validate/<uidb64>/<token>", views.reset_password_validate, name="reset_password_validate"),
     path("reset_password", views.reset_password, name="reset_password"),
+    path("vendor/", include('vendor.urls')),
     # path('login/', views.login,name="login"),
     # path('logout/', views.logout,name="logout"),
 ] 

@@ -1,0 +1,114 @@
+{% extends 'base.html'%}
+{% load static%}
+{% block content%}
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        {% comment %} include the alert html  {% endcomment %}
+        {% include 'includes/alerts.html'%}
+    </div>
+</div> 
+<!-- Main Section Start -->
+<div class="main-section">
+    {% include 'includes/cover.html'%}
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                    {% comment %} load vendor side bar {% endcomment %}
+                    {% include 'includes/v_sidebar.html'%}
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <h5 class="text-upper">Build Your Food Menu</h5>
+                            <hr>
+                            <h6> Update Food Item</h6>
+                            <form method="POST" action="{% url 'edit_fooditems' fooditem.id %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                {% comment %} {% for field in form%}
+                                    {% if field.errors %}
+                                        {% for error in field.errors %}
+                                            <li class="text-danger mb-1"> {{error}} </li>
+                                        {% endfor%}
+                                    {% endif %}
+                                {% endfor%} {% endcomment %}
+                                <div class="form-fields-set">
+                                    <div class="row">
+                                        
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field-holder">
+                                                <label>Category *</label>
+												    {{form.category}}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field-holder">
+                                                <label>Food Title *</label>
+												    {{form.food_title}}
+                                                    <label class="text-danger">{{form.food_title.errors}}</label>
+                                            </div> 
+                                        </div>
+                                        
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field-holder">
+                                                <label>Description</label>
+												    {{form.description}}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field-holder">
+                                                <label>Price</label>
+												    {{form.price}}
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="restaurant-info">
+                                                <div class="img-holder">
+                                                    <ul class="foodbakery-gallery-holder">
+                                                        <li class="gal-img">
+                                                            <div class="drag-list">
+                                                                <div class="item-thumb">
+                                                                    <img class="thumbnail" src="{{fooditem.images.url}}" alt="food image">
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="text-holder">
+                                                    <label>Food Image</label>
+                                                    <div class="upload-gallery">
+                                                        {{form.images}}
+                                                    </div>
+                                                    
+                                                </div>
+                                                <label class="text-danger">{{form.images.errors}}</label>
+                                            </div>
+                                        </div> 
+                                        {% comment %} <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field-holder">
+                                                <label>Image</label>
+												    {{form.images}}
+                                            </div>
+                                        </div> {% endcomment %}
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field-holder">
+                                                <label>Is_available</label>
+												    {{form.is_available}}
+                                            </div>
+                                        </div>
+                                        <button type="submit" class= "btn btn-success ml-3" ><i class="fa fa-check" aria-hidden="true"></i> Update </button>  
+                                        <a href="{% url 'fooditems_by_category' fooditem.category.id %}" class= "btn btn-secondary ml-3" ><i class="fa fa-close" aria-hidden="true"></i> Close </a>
+                                        {% comment %} <button class= "btn btn-secondary ml-3" onclick="history.back()"><i class="fa fa-angle-left" aria-hidden="true"></i> Back </button>                                          {% endcomment %}
+                                    </div>
+                                </div> 
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Main Section End -->
+
+{% endblock %}
