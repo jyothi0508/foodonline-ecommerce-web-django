@@ -24,3 +24,10 @@ function onPlaceChanged (){
     }
     // get the address components and assign them to the fields
 }
+
+$(document).ready(function(){
+    $('.add_to_cart').on('click',function(e){
+        e.preventDefault();
+        alert('test js');
+    });
+  });

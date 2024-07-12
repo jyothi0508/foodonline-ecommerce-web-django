@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from vendor.models import *
+from django.template.defaultfilters import slugify
 def check_role_vendor(user):
     if user.role == 1:
         return True
@@ -27,7 +28,7 @@ def check_role_cust(user):
 def registeruser(request):
     if request.user.is_authenticated:
         messages.warning(request, 'you are already Registered.')
-        return redirect('dashboard')
+        return redirect('myaccount')
     elif request.method == 'POST':
         form = RegisterUserForm(request.POST)
         if form.is_valid():
@@ -66,7 +67,7 @@ def myaccount(request):
 def registervendor(request):
     if request.user.is_authenticated:
         messages.warning(request, 'you are already Registered.')
-        return redirect('dashboard')
+        return redirect('myaccount')
     elif request.method == 'POST':
         form = RegisterUserForm(request.POST)
         v_form = VendorForm(request.POST, request.FILES)
@@ -80,9 +81,11 @@ def registervendor(request):
             user.role = NewUser.VENDOR
             user.save()
             vendor = v_form.save(commit=False)
+            vendor_name = v_form.cleaned_data['vendor_name']
             vendor.user = user
             user_profile = UserProfile.objects.get(user = user)
             vendor.user_profile = user_profile
+            vendor.vendor_slug = slugify(vendor_name) + '-'+ str(user.id)
             vendor.save() 
             # send verification email 
             mail_subject = 'please activaye your account'
